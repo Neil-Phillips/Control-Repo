@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=KMS Learning
+Type=Application
+Terminal=false
+Exec=/usr/local/bin/kms/kms.sh
+Icon=/usr/share/pixmaps/kms.png
+Comment=KMS Thrive Learning Platform
+Categories=Common;Learning;
