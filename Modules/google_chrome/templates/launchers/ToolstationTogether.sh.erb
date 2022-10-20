@@ -1,0 +1,11 @@
+# Managed by puppet - DO NOT MODIFY
+#
+#!/bin/bash
+
+chrome_version=google-chrome-stable --product-version
+user_agent="Mozilla/5.0 (X11; Linux x86_64) (KHTML, like Gecko) Ubuntu Chrome/$chrome_version $HOSTNAME"
+user_data_dir=/home/$USER/.chrome_kms
+trap "rm -rf $tmpdir" EXIT
+mkdir $tmpdir
+targetURL="https://toolstation.learn.link/"
+google-chrome-stable --start-maximized --proxy-pac-url=$proxyPacLocation --disable-dinosaur-easter-egg --disable-features=TranslateUI --user-agent="$user_agent" --user-data-dir=$user_data_dir --password-store=basic --disable-print-preview --app=$targetURL --no-sandbox

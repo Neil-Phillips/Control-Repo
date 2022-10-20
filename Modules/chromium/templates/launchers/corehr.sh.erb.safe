@@ -1,0 +1,42 @@
+# Managed by puppet - DO NOT MODIFY
+#
+#!/bin/bash
+
+chromium_version=chromium-browser --product-version
+user_agent="Mozilla/5.0 (X11; Linux x86_64) (KHTML, like Gecko) Ubuntu Chrome/$chromium_version $HOSTNAME"
+tmpdir=/tmp/chromium_corehr
+trap "rm -rf $tmpdir" EXIT
+mkdir $tmpdir
+
+<% if @hostgroup =~ /Default.Shops/ -%>
+<% if @fqdn !~ /wc.toolstation.shop/ -%>
+#proxyPacLocation=http://proxy.aws.toolstation.com/shop.pac
+<% else %>
+proxyPacLocation=http://proxy.hq.toolstation.com/proxy.pac
+<% end -%>
+<% end -%>
+<% if @hostgroup =~ /Warehouse/ -%>
+<% if @hostgroup =~ /Warehouse.Bridgwater/ -%>
+proxyPacLocation=http://proxy.hq.toolstation.com/proxy.pac
+<% end -%>
+<% if @hostgroup =~ /Warehouse.Redditch/ -%>
+#proxyPacLocation=http://proxy.aws.toolstation.com/proxy.pac
+<% end -%>
+<% if @hostgroup =~ /Warehouse.Daventry/ -%>
+#proxyPacLocation=http://proxy.aws.toolstation.com/proxy.pac
+<% end -%>
+<% if @hostgroup =~ /Warehouse.Middleton/ -%>
+<% if @fqdn =~ /goodsin/ or @fqdn =~ /packing/ or @fqdn =~ /replen/ or @fqdn =~ /TOS31889-ShawnHartley/  or @fqdn =~ /TOS37319-MSieniuc/ -%>
+#proxyPacLocation=http://proxy.aws.toolstation.com/shop.pac
+<% else %>
+#proxyPacLocation=http://proxy.aws.toolstation.com/shop.pac
+<% end -%>
+<% end -%>
+<% if @hostgroup !~ /Warehouse.Bridgwater/ and @hostgroup !~ /Warehouse.Redditch/ and @hostgroup !~ /Warehouse.Middleton/ and @hostgroup !~ /Warehouse.Daventry/ and @hostgroup !~ /Default.Shops/ -%>
+proxyPacLocation=http://proxy.aws.toolstation.com/shop.pac
+<% end -%>
+<% end -%>
+
+targetURL="https://my.corehr.com/pls/coreportal_toolp/cp_por_public_main_page.display_login_page"
+chromium-browser --start-maximized --proxy-pac-url=$proxyPacLocation --disable-dinosaur-easter-egg --disable-features=TranslateUI --user-agent="$user_agent" --user-data-dir=$tmpdir --password-store=basic --disable-print-preview --app=$targetURL --no-sandbox
+

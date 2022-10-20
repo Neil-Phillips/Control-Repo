@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=GSuite
+Type=Application
+Terminal=false
+Exec=/usr/local/bin/chromiumLaunchers/gsuite.sh
+Icon=/usr/share/pixmaps/gsuite.png
+Comment=Provides access to GSuite
+Categories=Common;

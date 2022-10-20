@@ -1,0 +1,8 @@
+## Managed by puppet - DO NOT MODIFY
+
+filebeat:  
+  prospectors:
+    -
+      paths:
+        - /var/log/apache2/*.log
+      input_type: log

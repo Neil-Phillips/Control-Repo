@@ -1,0 +1,9 @@
+## Managed by puppet - DO NOT MODIFY
+
+filebeat:  
+  prospectors:
+    -
+      paths:
+        - /var/log/suricata/eve.json 
+      input_type: log
+      document_type: SuricataIDPS 

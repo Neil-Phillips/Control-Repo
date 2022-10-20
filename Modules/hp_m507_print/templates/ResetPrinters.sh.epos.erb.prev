@@ -1,0 +1,187 @@
+<% if @fqdn =~ /[Mm]anager.*wc.toolstation/ -%>
+#!/bin/bash
+#
+# Managed by puppet - DO NOT MODIFY
+#
+# Created By Luke Bale for Toolstation LTD 2020
+sleep 10
+
+#Avaliable Printers
+Main_Printer=10.0.3.130
+
+#Get the model number of the networked printers
+function get_network_printer_model() {
+printer_model=`snmpwalk -v 1 -c public -O v $@ iso.3.6.1.2.1.25.3.2.1.3.1 | sed 's/.* LaserJet / /' | cut -d \  -f 2 | tr '[A-Z]' '[a-z]' | tr -d '"'`
+}
+
+#remove all printers in the system
+number_of_printers=`/usr/bin/lpstat -p | grep printer | /usr/bin/awk '{print $2}' | wc -l`
+while [ $number_of_printers -gt 0 ]
+do
+        /usr/bin/lpstat -p | grep printer | /usr/bin/awk '{print $2}' | /usr/bin/xargs /usr/sbin/lpadmin -x
+        number_of_printers=$[$number_of_printers-1]
+done
+
+#add printers that are available
+if ping -c 2 -W 1 ${Main_Printer}; then
+        get_network_printer_model ${Main_Printer}
+        /usr/sbin/lpadmin -E -p Main_Printer -v socket://${Main_Printer}/printers/Main_Printer -P /etc/cups/ppd/hp_laserjet_${printer_model}.ppd -u allow:all
+        /usr/sbin/accept Main_Printer
+        /usr/sbin/cupsenable Main_Printer
+fi
+
+/usr/sbin/lpadmin -d Main_Printer
+
+###colour###
+if lsusb | grep Hewlett-Packard; then
+    if lsusb | grep 03f0 | awk '{print $6}' | grep 8d17; then
+        usb_printer_model=p3010
+    elif lsusb | grep 03f0 | awk '{print $6}' | grep 7317; then
+        usb_printer_model=p3005
+    elif lsusb | grep 03f0 | awk '{print $6}' | grep 422a; then
+        usb_printer_model=m506
+    elif lsusb | grep 03f0 | awk '{print $6}' | grep ca2a; then
+        usb_printer_model=m507
+        elif lsusb | grep 03f0 | awk '{print $6}' | grep 582a; then
+        usb_printer_model=m552
+    fi
+    case ${usb_printer_model} in
+        p3005)
+            /usr/sbin/lpadmin -E -p colour_printer -v usb://HP/LaserJet%20P3005 -P /etc/cups/ppd/hp_laserjet_p3005.ppd -u allow:all
+        ;;
+        p3010)
+            /usr/sbin/lpadmin -E -p colour_printer -v usb://HP/LaserJet%20P3010%20Series -P /etc/cups/ppd/hp_laserjet_p3010.ppd -u allow:all
+        ;;
+        m506)
+            # Update CUPS USB-quirks file if it's not already been done
+            if [ ! "`grep \"0x03f0 0x422a soft-reset\" /usr/share/cups/usb/org.cups.usb-quirks`" ] ; then
+                echo -e "\n# HP Laserjet M506\n0x03f0 0x422a soft-reset" >> /usr/share/cups/usb/org.cups.usb-quirks
+            fi
+        /usr/sbin/lpadmin -E -p colour_printer -v usb://HP/LaserJet%20M506 -P /etc/cups/ppd/hp_laserjet_m506.ppd -u allow:all
+        ;;
+        m507)
+	        # Update CUPS USB-quirks file if it's not already been done
+            if [ ! "`grep \"0x03f0 0xca2a soft-reset\" /usr/share/cups/usb/org.cups.usb-quirks`" ] ; then
+                echo -e "\n# HP Laserjet M507\n0x03f0 0xca2a soft-reset" >> /usr/share/cups/usb/org.cups.usb-quirks
+            fi
+        /usr/sbin/lpadmin -E -p colour_printer -v usb://HP/LaserJet%20M507 -P /etc/cups/ppd/hp_laserjet_m507.ppd -u allow:all
+        ;;
+        m552)
+	        # Update CUPS USB-quirks file if it's not already been done
+            if [ ! "`grep \"0x03f0 0x582a soft-reset\" /usr/share/cups/usb/org.cups.usb-quirks`" ] ; then
+                echo -e "\n# HP Laserjet M552\n0x03f0 0x582a soft-reset" >> /usr/share/cups/usb/org.cups.usb-quirks
+            fi
+        /usr/sbin/lpadmin -E -p colour_printer -v hp:/usb/HP_Color_LaserJet_M552?serial=JPCVM620S2 -P /etc/cups/ppd/hp_laserjet_m552.ppd -u allow:all
+        ;;
+    esac
+    /usr/sbin/accept colour_printer
+    /usr/sbin/lpadmin -d colour_printer
+    /usr/sbin/cupsenable colour_printer
+fi
+<% else -%>
+#!/bin/bash
+#
+# Managed by puppet - DO NOT MODIFY
+#
+#reset_printers.sh - removes all printers and then attempts to restore the default setup from build time
+#get the IP address of the system and form the IP address(es) of the printer(s)
+interface_name=`ip link show | grep "state UP" | cut -d: -f2`
+
+<% if @lsbdistrelease == '18.04' -%>
+ipaddress=`ip addr | grep "10\." | awk '{print$2}' | cut -d/ -f1`
+<% else -%>
+ipaddress=`ifconfig $interface_name | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'`
+<% end -%>
+
+threeoctets=`echo $ipaddress | cut -d. -f1-3`
+printer_ip100=$threeoctets.100
+printer_ip101=$threeoctets.101
+
+#definitions (use to override the automatic setting above)
+#printer_ip100=###ip100###
+#printer_ip101=###ip101###
+
+function get_network_printer_model() {
+printer_model=`snmpwalk -v 1 -c public -O v $@ iso.3.6.1.2.1.25.3.2.1.3.1 | sed 's/.* LaserJet / /' | cut -d \  -f 2 | tr '[A-Z]' '[a-z]' | tr -d '"'`
+}
+
+#remove all printers in the system
+number_of_printers=`/usr/bin/lpstat -p | grep printer | awk '{print $2}' | wc -l`
+while [ $number_of_printers -gt 0 ]
+do
+    /usr/bin/lpstat -p | grep printer | awk '{print $2}' | /usr/bin/xargs /usr/sbin/lpadmin -x
+    number_of_printers=$[$number_of_printers-1]
+done
+
+###epos###
+#add printers that are available
+if ping -c 2 -W 1 ${printer_ip100}; then
+    get_network_printer_model ${printer_ip100}
+    /usr/sbin/lpadmin -E -p ip100 -v socket://${printer_ip100}/printers/ip100 -P /etc/cups/ppd/hp_laserjet_${printer_model}.ppd -u allow:all
+    /usr/sbin/accept ip100
+    /usr/sbin/cupsenable ip100
+    /usr/sbin/lpadmin -p ip100 -c shop-printer
+fi
+
+if ping -c 2 -W 1 ${printer_ip101}; then
+    get_network_printer_model ${printer_ip101}
+    /usr/sbin/lpadmin -E -p ip101 -v socket://${printer_ip101}/printers/ip101 -P /etc/cups/ppd/hp_laserjet_${printer_model}.ppd -u allow:all
+    /usr/sbin/accept ip101
+    /usr/sbin/cupsenable ip101
+    /usr/sbin/lpadmin -p ip101 -c shop-printer
+fi
+
+/usr/sbin/accept shop-printer
+/usr/sbin/cupsenable shop-printer
+/usr/sbin/lpadmin -d shop-printer
+
+####thermal###
+if lsusb | grep "Seiko Epson"; then
+   /usr/sbin/lpadmin -E -p thermal-printer -v tmbaprn:/ESDPRT001 -P /etc/cups/ppd/tm-t20ii.ppd -u allow:all
+   /usr/sbin/accept thermal-printer
+   /usr/sbin/cupsenable thermal-printer
+fi
+
+###manager###
+if lsusb | grep Hewlett-Packard; then
+    if lsusb | grep 03f0 | awk '{print $6}' | grep 8d17; then
+        usb_printer_model=p3010
+    elif lsusb | grep 03f0 | awk '{print $6}' | grep 7317; then
+        usb_printer_model=p3005
+    elif lsusb | grep 03f0 | awk '{print $6}' | grep 422a; then
+        usb_printer_model=m506
+    elif lsusb | grep 03f0 | awk '{print $6}' | grep ca2a; then
+        usb_printer_model=m507
+    fi
+    case ${usb_printer_model} in
+        p3005)
+            /usr/sbin/lpadmin -E -p manager-printer -v usb://HP/LaserJet%20P3005 -P /etc/cups/ppd/hp_laserjet_p3005.ppd -u allow:all
+        ;;
+        p3010)
+            /usr/sbin/lpadmin -E -p manager-printer -v usb://HP/LaserJet%20P3010%20Series -P /etc/cups/ppd/hp_laserjet_p3010.ppd -u allow:all
+        ;;
+        m506)
+            # Update CUPS USB-quirks file if it's not already been done
+            if [ ! "`grep \"0x03f0 0x422a soft-reset\" /usr/share/cups/usb/org.cups.usb-quirks`" ] ; then
+                echo -e "\n# HP Laserjet M506\n0x03f0 0x422a soft-reset" >> /usr/share/cups/usb/org.cups.usb-quirks
+            fi
+        /usr/sbin/lpadmin -E -p manager-printer -v usb://HP/LaserJet%20M506 -P /etc/cups/ppd/hp_laserjet_m506.ppd -u allow:all
+        ;;
+        m507)
+	        # Update CUPS USB-quirks file if it's not already been done
+            if [ ! "`grep \"0x03f0 0xca2a soft-reset\" /usr/share/cups/usb/org.cups.usb-quirks`" ] ; then
+                echo -e "\n# HP Laserjet M507\n0x03f0 0xca2a soft-reset" >> /usr/share/cups/usb/org.cups.usb-quirks
+            fi
+        /usr/sbin/lpadmin -E -p manager-printer -v usb://HP/LaserJet%20M507 -P /etc/cups/ppd/hp_laserjet_m507.ppd -u allow:all
+        ;;
+    esac
+    /usr/sbin/accept manager-printer
+    /usr/sbin/lpadmin -d manager-printer
+    /usr/sbin/cupsenable manager-printer
+fi
+
+#display an error if no printers have been added
+if [ `/usr/bin/lpstat -p | grep printer | /usr/bin/awk '{print $2}' | wc -l` = 0 ]; then
+    zenity --title="Printer Connection Error" --display=:0.0 --width=300 --warning --window-icon=/usr/share/pixmaps/Printer.png --no-wrap --text="Couldn't detect a printer - no printers are available.\n\n(Hint - printer must be showing 'READY'\nbefore the computer is switched on)\n\n Click OK to continue"
+fi
+<% end -%>
