@@ -1,0 +1,8 @@
+## Managed by puppet - DO NOT MODIFY
+
+filebeat:  
+  prospectors:
+    -
+      paths:
+        - /var/log/unattended-upgrades/unattended-upgrades.log
+      input_type: log

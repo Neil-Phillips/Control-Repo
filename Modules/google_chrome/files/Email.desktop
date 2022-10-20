@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=Email
+Type=Application
+Terminal=false
+Exec=/usr/local/bin/chromiumLaunchers/Email.sh
+Icon=/usr/share/pixmaps/Email.png
+Comment=Zimbra email client. Send and receive email, and use a calendar
+Categories=Common;
