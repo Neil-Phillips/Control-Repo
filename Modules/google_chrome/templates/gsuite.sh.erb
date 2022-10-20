@@ -1,0 +1,38 @@
+#!/bin/bash
+mkdir $tmpdir
+
+<% if @hostgroup =~ /Default.Shops/ -%>
+<% if @fqdn !~ /wc.toolstation.shop/ -%>
+#proxyPacLocation=http://proxy.aws.toolstation.com/shop.pac
+<% else %>
+proxyPacLocation=http://proxy.hq.toolstation.com/proxy.pac
+<% end -%>
+<% end -%>
+<% if @hostgroup =~ /Warehouse/ -%>
+<% if @hostgroup =~ /Warehouse.Bridgwater/ -%>
+proxyPacLocation=http://proxy.hq.toolstation.com/proxy.pac
+<% end -%>
+<% if @hostgroup =~ /Warehouse.Redditch/ -%>
+#proxyPacLocation=http://proxy.aws.toolstation.com/proxy.pac
+<% end -%>
+<% if @hostgroup =~ /Warehouse.Daventry/ -%>
+#proxyPacLocation=http://proxy.aws.toolstation.com/proxy.pac
+<% end -%>
+<% if @hostgroup =~ /Warehouse.Middleton/ -%>
+<% if @fqdn =~ /goodsin/ or @fqdn =~ /packing/ or @fqdn =~ /replen/ or @fqdn =~ /TOS31889-ShawnHartley/  or @fqdn =~ /TOS37319-MSieniuc/ -%>
+#proxyPacLocation=http://proxy.aws.toolstation.com/shop.pac
+<% else %>
+#proxyPacLocation=http://proxy.aws.toolstation.com/proxy.pac
+<% end -%>
+<% end -%>
+<% if @hostgroup !~ /Warehouse.Bridgwater/ and @hostgroup !~ /Warehouse.Redditch/ and @hostgroup !~ /Warehouse.Middleton/ and @hostgroup !~ /Warehouse.Daventry/ and @hostgroup !~ /Default.Shops/ -%>
+proxyPacLocation=http://proxy.aws.toolstation.com/shop.pac
+<% end -%>
+<% end -%>
+<% if @fqdn =~ /TOS41965-Warehouseoffice/ -%>
+proxyPacLocation=http://proxy.hq.toolstation.com/proxy.pac
+<% end -%>
+
+
+# Until 01/02/2021 was https://gsuite.google.com/u/0/dashboard
+/usr/bin/google-chrome-stable https://workspace.google.com/dashboard --proxy-pac-url=$proxyPacLocation --disable-dinosaur-easter-egg --disable-features=TranslateUI --user-data-dir=$tmpdir --password-store=basic --disable-print-preview --app=$targetURL

@@ -1,0 +1,21 @@
+# Managed by puppet - DO NOT MODIFY
+#
+#!/bin/bash
+
+chrome_version=`/usr/bin/google-chrome-stable --product-version`
+user_agent="Mozilla/5.0 (X11; Linux x86_64) (KHTML, like Gecko) Ubuntu Chrome/$chrome_version $HOSTNAME"
+tmpdir=/tmp/chrome_extranet
+trap "rm -rf $tmpdir" EXIT
+mkdir $tmpdir
+
+<% if @hostgroup =~ /Default.Shops/ -%>
+<% if @fqdn !~ /wc.toolstation.shop/ -%>
+#proxyPacLocation=http://proxy.aws.toolstation.com/shop.pac
+<% else %>
+proxyPacLocation=http://proxy.hq.toolstation.com/proxy.pac
+<% end -%>
+<% else %>
+proxyPacLocation=http://proxy.aws.toolstation.com/shop.pac
+<% end -%>
+
+/usr/bin/google-chrome-stable https://extranet.toolstation.com --proxy-pac-url=$proxyPacLocation --disable-dinosaur-easter-egg --disable-features=TranslateUI --user-data-dir=$tmpdir --password-store=basic

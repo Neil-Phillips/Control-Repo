@@ -1,0 +1,73 @@
+## Managed by puppet - DO NOT MODIFY
+
+<% if @system_mod -%>
+filebeat.modules:
+- module: system
+  syslog:
+    enabled: true
+    prospector:
+      fields:
+        location: <%= @location %>
+        country: <%= @country %>
+
+  # Authorization logs
+  auth:
+    enabled: true
+    prospector:
+      fields:
+        location: <%= @location %>
+        country: <%= @country %>
+
+<% end -%>
+<% if @apache_mod -%>
+- module: apache2
+  # Access logs
+  access:
+    enabled: true
+    prospector:
+      fields:
+        location: <%= @location %>
+        country: <%= @country %>
+
+  # Error logs
+  error:
+    enabled: true
+    prospector:
+      fields:
+        location: <%= @location %>
+        country: <%= @country %>
+
+
+<% end -%>
+
+filebeat.prospectors:
+<% if @prospectors != [] -%>
+<% @prospectors.each do |location| -%>
+- type: log
+  paths:
+    - <%= location %>
+    prospector:
+      fields:
+        location: <%= @location %>
+        country: <%= @country %>
+
+<% end -%>
+<% end -%>
+
+output.logstash:
+  hosts: ["<%= @_server_ip %>:5044"]
+  worker: 1
+  ssl.certificate_authorities: ["<%= @logstash_ca %>"]
+  ssl.certificate: "<%= @logstash_crt %>"
+  ssl.key: "<%= @logstash_key %>"
+  ssl.verification_mode: none
+shipper:
+
+logging:
+
+  files:
+    path: /var/log/filebeat
+    name: filebeat
+    rotateeverybytes: 10485760 # = 10MB
+    keepfiles: 7
+  level: error

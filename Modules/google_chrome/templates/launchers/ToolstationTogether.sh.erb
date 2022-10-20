@@ -1,0 +1,27 @@
+# Managed by puppet - DO NOT MODIFY
+#
+#!/bin/bash
+
+chrome_version=google-chrome-stable --product-version
+user_agent="Mozilla/5.0 (X11; Linux x86_64) (KHTML, like Gecko) Ubuntu Chrome/$chrome_version $HOSTNAME"
+user_data_dir=/home/$USER/.chrome_toolstationtogether
+#trap "rm -rf $tmpdir" EXIT
+mkdir $tmpdir
+
+<% if @hostgroup =~ /Default.Shops/ -%>
+<% if @fqdn !~ /wc.toolstation.shop/ -%>
+#proxyPacLocation=http://proxy.aws.toolstation.com/shop.pac
+<% else %>
+proxyPacLocation=http://proxy.hq.toolstation.com/proxy.pac
+<% end -%>
+<% end -%>
+<% if @hostgroup =~ /Warehouse.Bridgwater/ -%>
+#proxyPacLocation=http://proxy.hq.toolstation.com/proxy.pac
+<% end -%>
+<% if @hostgroup !~ /Warehouse.Bridgwater/ and @hostgroup !~ /Default.Shops/ -%>
+#proxyPacLocation=http://proxy.aws.toolstation.com/shop.pac
+<% end -%>
+
+targetURL="https://sites.google.com/toolstation.com/toolstation-together/home"
+google-chrome-stable --start-maximized --proxy-pac-url=$proxyPacLocation --disable-dinosaur-easter-egg --disable-features=TranslateUI --user-agent="$user_agent" --user-data-dir=$user_data_dir --password-store=basic --disable-print-preview --app=$targetURL --no-sandbox
+

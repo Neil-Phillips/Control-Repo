@@ -1,0 +1,12 @@
+# Managed by Puppet - DO NOT MODIFY
+
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=EPOS App
+Type=Application
+Terminal=false
+Exec=/usr/local/bin/launchers/EPOS_app.sh
+Icon=/usr/share/pixmaps/trolley_black.png
+Comment=Open the EPOS Application
+Categories=Contact;epos;
