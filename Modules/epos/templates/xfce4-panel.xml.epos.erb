@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xfce4-panel" version="1.0" locked="*" unlocked="root;@wheel">
+  <property name="panels" type="uint" value="1">
+    <property name="panel-0" type="empty">
+      <property name="position" type="string" value="p=6;x=0;y=0"/>
+      <property name="size" type="uint" value="24"/>
+      <property name="length" type="uint" value="100"/>
+      <property name="position-locked" type="bool" value="true"/>
+      <property name="plugin-ids" type="array">
+        <value type="int" value="13"/>
+        <value type="int" value="7"/>
+        <value type="int" value="8"/>
+        <value type="int" value="12"/>
+        <value type="int" value="3"/>
+        <value type="int" value="11"/>
+        <value type="int" value="5"/>
+        <value type="int" value="9"/>
+        <value type="int" value="10"/>
+      </property>
+    </property>
+  </property>
+  <property name="plugins" type="empty">
+   <property name="plugin-3" type="string" value="tasklist"/>
+    <property name="plugin-5" type="string" value="xfce4-orageclock-plugin"/>
+    <property name="plugin-13" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="EPOS_app.desktop"/>
+      </property>
+    </property>
+<% if @toolstation_together -%>
+    <property name="plugin-5" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="toolstationtogether.desktop"/>
+      </property>
+    </property>
+<% end -%>
+    <property name="plugin-7" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="Website.desktop"/>
+      </property>
+    </property>
+    <property name="plugin-8" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="Help.desktop"/>
+      </property>
+    </property>
+    <property name="plugin-12" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="PrintPickingList.desktop"/>
+      </property>
+    </property>
+    <property name="plugin-11" type="string" value="separator">
+      <property name="expand" type="bool" value="true"/>
+      <property name="style" type="uint" value="0"/>
+    </property>
+    <property name="plugin-9" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="SysInfo.desktop"/>
+      </property>
+    </property>
+    <property name="plugin-10" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="PowerControl.desktop"/>
+      </property>
+    </property>
+  </property>
+</channel>
+
+

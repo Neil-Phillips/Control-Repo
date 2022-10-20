@@ -1,0 +1,12 @@
+<%# The last line must not be terminated with a , -%>
+<%# Because if it is, it will break the application! -%>
+{
+        "siteId": "<%= @till_location %>",
+        "tillId": "<%= @tillid %>",
+        "couchDbUrl": "<%= @couchdburl %>",
+        "apiUrl": "<%= @apiurl %>",
+        "apiClientId": "<%= @apiclientid %>",
+        "apiClientSecret": "<%= @apiclientsecret %>",
+        "localStoragePath": "<%= @local_storage %>",
+        "pdqIp": "<%= @_pdqip %>"
+}

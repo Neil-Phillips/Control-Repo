@@ -1,0 +1,7 @@
+    "<%= @group %>":
+<% if @factname == 'domain' -%>
+      "<%= @factname %>" : "<%= @fqdn %>"
+<% else -%>
+      "<%= @factname %>" : /.*\.(<% @depotid.each do |id| -%>|<%= id %><% end -%>).<%= @domain %>/
+<%#      "<%= @factname " : ".*.+\.(<% @depotid.each do |id| -%>
+<% end -%>
